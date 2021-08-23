@@ -1,24 +1,9 @@
 require('dotenv').config()
-
 require("dotenv").config();
 const request = require("request");
 const cheerio = require("cheerio");
 
-  // const webScraper = async () => {
-  //   try {
-  //     let start = Date.now();
-  //     result = await requestScraper();
 
-  //     let end = Date.now();
-  //     let elapsed = end - start;
-  //     console.log(`
-  //     Date: ${new Date().toString().replace(" GMT+0100", " ")}
-  //     Time Taken: ${elapsed / 1000} seconds 
-  //     \n`);
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // }
 
 const proxy = {
   user: process.env.USER,
@@ -32,6 +17,7 @@ let requestOptions = {
   outOfStockIdentifier: "#dp",
   outStockText: "Currently unavailable",
   monitor_delay: 5000,
+  current_text: ""
 };
 
 let options = {
@@ -40,28 +26,27 @@ let options = {
 };
 
 
-let requestScraper = () => {
+let requestScraper = async () => {
   let start = Date.now();
-
-  console.log("request here")
   result = request({
     'url': requestOptions.websiteLink,
     'method': "GET",
     // 'proxy': options.proxy //PROXY IS optional
   }, 
-  function await (error, response, html) {
+  function(error, response, html){
     if (!error && response.statusCode === 200) {
-      // console.log(html)
       const $ = cheerio.load(html);
       const buyBox = $(requestOptions.outOfStockIdentifier)
         .text()
         .replace(/\s\s+/g, "");
       if (buyBox.includes(requestOptions.outStockText)) {
+        requestOptions.current_text = requestOptions.outStockText
+        console.log(requestOptions.current_text)
         console.log(`${requestOptions.websiteLink} is displaying ${requestOptions.outStockText}`);
       } else {
+        requestOptions.current_text = "In Stock"
         console.log(`Item is in stock at ${requestOptions.websiteLink}`);
       }
-      // console.log("end of request here")
     } else {
       console.log(error)
     }
@@ -73,11 +58,10 @@ let requestScraper = () => {
     Time Taken: ${elapsed / 1000} seconds 
     \n`);
   });
-
 };
 
 
-
-requestScraper();
-
-// module.exports = webScraper;
+module.exports = {
+  requestScraper,
+  requestOptions
+};
