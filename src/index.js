@@ -1,5 +1,7 @@
 import dotenv from 'dotenv';
 import request from 'request';
+// TODO: SWITCH TO AXIOS
+// TODO: FIX PROXY
 import cheerio from 'cheerio';
 dotenv.config()
 
@@ -14,8 +16,8 @@ export const requestOptions = {
   websiteLink: "https://www.amazon.co.uk/PlayStation-9395003-5-Console/dp/B08H95Y452/",
   outOfStockIdentifier: "#dp",
   outStockText: "Currently unavailable",
-  monitor_delay: 5000,
-  current_text: ""
+  monitorDelay: 5000,
+  currentText: ""
 };
 
 export const options = {
@@ -24,36 +26,47 @@ export const options = {
 };
 
 
+
+const calcTimeTaken = ( end, start ) => {
+  const elapsed = end - start;
+  console.log(`
+  Date: ${new Date().toString().replace(" GMT+0100", " ")}
+  Time Taken: ${elapsed / 1000} seconds 
+  \n`);
+}
+
 export const requestScraper = async () => {
-  let start = Date.now();
+
+  // TODO: destructure requestOptions
+let { websiteLink, outOfStockIdentifier, outStockText,  monitorDelay, currentText } = requestOptions
+
+
+  const start = Date.now();
   request({
-    'url': requestOptions.websiteLink,
+    'url': websiteLink,
     'method': "GET",
     // 'proxy': options.proxy //PROXY IS optional
   }, 
   function(error, response, html){
     if (!error && response.statusCode === 200) {
       const $ = cheerio.load(html);
-      const buyBox = $(requestOptions.outOfStockIdentifier)
+      const buyBox = $(outOfStockIdentifier)
         .text()
         .replace(/\s\s+/g, "");
-      if (buyBox.includes(requestOptions.outStockText)) {
-        requestOptions.current_text = requestOptions.outStockText
-        console.log(requestOptions.current_text)
-        console.log(`${requestOptions.websiteLink} is displaying ${requestOptions.outStockText}`);
+      if (buyBox.includes(outStockText)) {
+        currentText = outStockText
+        console.log(currentText)
+        console.log(`${websiteLink} is displaying ${outStockText}`);
       } else {
-        requestOptions.current_text = "In Stock"
-        console.log(`Item is in stock at ${requestOptions.websiteLink}`);
+        currentText = "In Stock"
+        console.log(`Item is in stock at ${websiteLink}`);
       }
     } else {
       console.log(error)
     }
 
-    let end = Date.now();
-    let elapsed = end - start;
-    console.log(`
-    Date: ${new Date().toString().replace(" GMT+0100", " ")}
-    Time Taken: ${elapsed / 1000} seconds 
-    \n`);
+    const end = Date.now();
+    calcTimeTaken( end, start )
   });
 };
+
