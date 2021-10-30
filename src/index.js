@@ -35,6 +35,14 @@ const calcTimeTaken = ( end, start ) => {
   \n`);
 }
 
+const inStockPing = (websiteLink, outStockText) => {
+  console.log(`${websiteLink} is displaying ${outStockText}`);
+}
+
+const outOfStockPing = (websiteLink) => {
+  console.log(`Item is in stock at ${websiteLink}`);
+}
+
 export const requestScraper = async () => {
 
   // TODO: destructure requestOptions
@@ -46,20 +54,16 @@ let { websiteLink, outOfStockIdentifier, outStockText,  monitorDelay, currentTex
     'method': "GET",
     // 'proxy': options.proxy //PROXY IS optional
   }, 
-  function(error, response, html){
+  async function(error, response, html){
     if (!error && response.statusCode === 200) {
       const $ = cheerio.load(html);
       const buyBoxContainer = $(outOfStockIdentifier)
         .text()
         .replace(/\s\s+/g, "");
       if (buyBoxContainer.includes(outStockText)) {
-        // if out of stock, console log and return
-        currentText = outStockText
-        console.log(currentText)
-        console.log(`${websiteLink} is displaying ${outStockText}`);
+        inStockPing(websiteLink, outStockText);
       } else {
-        // if out of stock, console log in stock, set a timeout for 45s
-        console.log(`Item is in stock at ${websiteLink}`);
+        outOfStockPing(websiteLink);
         await timer(inStockDelay);
       }
     } else {
@@ -70,4 +74,3 @@ let { websiteLink, outOfStockIdentifier, outStockText,  monitorDelay, currentTex
     calcTimeTaken( end, start )
   });
 };
-
