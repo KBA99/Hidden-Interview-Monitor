@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import request from 'request';
 // TODO: SWITCH TO AXIOS
 // TODO: FIX PROXY
+const timer = (ms) => new Promise((res) => setTimeout(res, ms));
 import cheerio from 'cheerio';
 dotenv.config()
 
@@ -17,6 +18,7 @@ export const requestOptions = {
   outOfStockIdentifier: "#dp",
   outStockText: "Currently unavailable",
   monitorDelay: 5000,
+  inStockDelay: 60_000,
   currentText: ""
 };
 
@@ -24,8 +26,6 @@ export const options = {
   url: requestOptions.websiteLink,
   proxy: `http://${proxy.user}:${proxy.password}@${proxy.host}:${proxy.port}`,
 };
-
-
 
 const calcTimeTaken = ( end, start ) => {
   const elapsed = end - start;
@@ -38,8 +38,7 @@ const calcTimeTaken = ( end, start ) => {
 export const requestScraper = async () => {
 
   // TODO: destructure requestOptions
-let { websiteLink, outOfStockIdentifier, outStockText,  monitorDelay, currentText } = requestOptions
-
+let { websiteLink, outOfStockIdentifier, outStockText,  monitorDelay, currentText, inStockDelay } = requestOptions
 
   const start = Date.now();
   request({
@@ -54,12 +53,14 @@ let { websiteLink, outOfStockIdentifier, outStockText,  monitorDelay, currentTex
         .text()
         .replace(/\s\s+/g, "");
       if (buyBoxContainer.includes(outStockText)) {
+        // if out of stock, console log and return
         currentText = outStockText
         console.log(currentText)
         console.log(`${websiteLink} is displaying ${outStockText}`);
       } else {
-        currentText = "In Stock"
+        // if out of stock, console log in stock, set a timeout for 45s
         console.log(`Item is in stock at ${websiteLink}`);
+        await timer(inStockDelay);
       }
     } else {
       console.log(error)
