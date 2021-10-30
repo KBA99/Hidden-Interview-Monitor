@@ -1,18 +1,16 @@
-require('dotenv').config()
-require("dotenv").config();
-const request = require("request");
-const cheerio = require("cheerio");
+import dotenv from 'dotenv';
+import request from 'request';
+import cheerio from 'cheerio';
+dotenv.config()
 
-
-
-const proxy = {
+export const proxy = {
   user: process.env.USER,
   password: process.env.PASSWORD,
   host: process.env.HOST,
   port: process.env.PORT,
 };
 
-let requestOptions = {
+export const requestOptions = {
   websiteLink: "https://www.amazon.co.uk/PlayStation-9395003-5-Console/dp/B08H95Y452/",
   outOfStockIdentifier: "#dp",
   outStockText: "Currently unavailable",
@@ -20,15 +18,15 @@ let requestOptions = {
   current_text: ""
 };
 
-let options = {
+export const options = {
   url: requestOptions.websiteLink,
   proxy: `http://${proxy.user}:${proxy.password}@${proxy.host}:${proxy.port}`,
 };
 
 
-let requestScraper = async () => {
+export const requestScraper = async () => {
   let start = Date.now();
-  result = request({
+  request({
     'url': requestOptions.websiteLink,
     'method': "GET",
     // 'proxy': options.proxy //PROXY IS optional
@@ -58,10 +56,4 @@ let requestScraper = async () => {
     Time Taken: ${elapsed / 1000} seconds 
     \n`);
   });
-};
-
-
-module.exports = {
-  requestScraper,
-  requestOptions
 };

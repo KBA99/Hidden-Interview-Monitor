@@ -1,4 +1,4 @@
-const { requestScraper, requestOptions } = require("./index.js")
+import { requestScraper, requestOptions } from "./index.js"
 
 requestScraper()
 
