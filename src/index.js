@@ -50,10 +50,10 @@ let { websiteLink, outOfStockIdentifier, outStockText,  monitorDelay, currentTex
   function(error, response, html){
     if (!error && response.statusCode === 200) {
       const $ = cheerio.load(html);
-      const buyBox = $(outOfStockIdentifier)
+      const buyBoxContainer = $(outOfStockIdentifier)
         .text()
         .replace(/\s\s+/g, "");
-      if (buyBox.includes(outStockText)) {
+      if (buyBoxContainer.includes(outStockText)) {
         currentText = outStockText
         console.log(currentText)
         console.log(`${websiteLink} is displaying ${outStockText}`);
